@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .header {
+            background-color: #68b2e8;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 150px;
+        }
+        .card img {
+            width: 50px;
+            height: 50px;
+        }
+        .card p {
+            margin: 10px 0 0;
+            font-size: 18px;
+        }
+        .card .value {
+            font-size: 24px;
+            color: #333;
+        }
+        .image-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 300px;
+        }
+        .image-container img {
+            width: 50px;
+            height: 50px;
+        }
+        .image-container .image-box {
+            border: 1px solid #ccc;
+            height: 200px;
+            width: 300px;  /* Perbaiki penulisan 'widht' menjadi 'width' */
+            margin-top: 10px;
+        }
+        .image-box img {
+            object-fit: cover;  /* Gambar akan memenuhi kotak dengan proporsi yang tepat */
+            width: 100%;        /* Gambar akan mengisi lebar kotak */
+            height: 100%;       /* Gambar akan mengisi tinggi kotak */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Dashboard
+    </div>
+    <div class="container">
+        <div class="card">
+           <img src="{{ url_for('static', filename='images/icon/suhu.png') }}" alt="Suhu">
+            <p>Suhu</p>
+            <p class="value" id="temperature">Loading...</p>
+        </div>
+        <div class="card">
+           <img src="{{ url_for('static', filename='images/icon/kelembaban.png') }}" alt="Kelembaban">
+            <p>Kelembaban</p>
+            <p class="value" id="humidity">Loading...</p>
+        </div>
+        <div class="card">
+            <img src="{{ url_for('static', filename='images/icon/ph.png') }}" alt="pH">
+            <p>pH</p>
+            <p class="value" id="ph">Loading...</p>
+        </div>
+        <div class="card">
+             <img src="{{ url_for('static', filename='images/icon/cahaya.png') }}" alt="Cahaya">
+            <p>Cahaya</p>
+            <p class="value" id="light_intensity">Loading...</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="image-container">
+            <img src="{{ url_for('static', filename='images/icon/camera.png') }}" alt="Gambar">
+            <p>Gambar</p>
+            <div class="image-box">
+                <img id="captured_image" src="" alt="No Image Captured" style="max-width: 100%; height: 100%;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk memperbarui data
+        function updateData() {
+            fetch('/sensor_data')
+                .then(response => response.json())
+                .then(sensor_data => {
+                    document.getElementById('temperature').textContent = sensor_data.temperature + "°C";
+                    document.getElementById('humidity').textContent = sensor_data.humidity ;
+                    document.getElementById('ph').textContent = sensor_data.ph;
+                    document.getElementById('light_intensity').textContent = sensor_data.light_intensity;
+
+                    // Update gambar jika ada
+                    if (sensor_data.image) {
+                        document.getElementById('captured_image').src = '/static/images/' + sensor_data.image.split('/').pop();
+                    } else {
+                        document.getElementById('captured_image').src = '';
+                        document.getElementById('captured_image').alt = 'No Image Captured';
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Ambil data pertama kali saat halaman dimuat
+        updateData();
+
+        // Update data setiap 5 detik
+        setInterval(updateData, 5000);  // Ganti 500000 dengan 5000 untuk pembaruan setiap 5 detik
+    </script>
+</body>
+</html>
