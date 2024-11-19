@@ -16,7 +16,8 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-RUN pip install --no-cache-dir flask Adafruit_DHT
+RUN pip install --no-cache-dir flask
+RUN pip install --no-cache-dir Adafruit_DHT --global-option=build_ext --global-option='--force-pi'
 
 # Expose the port the app runs on
 EXPOSE 5000
